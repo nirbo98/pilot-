@@ -231,6 +231,8 @@ results.push({participant:pid,image_id:img.id,category:img.category,order:idx+1,
 idx++;showNextImage();
 }
 
+const SHEET_URL='https://script.google.com/macros/s/AKfycbwOb6x8X5r8P1So9Zfw3dzVxsLvogZgFu61OKOyAdH7p_slE9-vSYWSaQk1Z-Tbsd11/exec';
+
 function submitDemo(){
 const age=document.getElementById('demo-age').value,gender=document.getElementById('demo-gender').value,visit=document.getElementById('demo-visit').value;
 results.forEach(r=>{r.age=age;r.gender=gender;r.visited=visit});
@@ -238,7 +240,14 @@ const hdr=['participant','image_id','category','order','fear','disgust','sadness
 let csv=hdr.join(',')+'\n';
 results.forEach(r=>{csv+=hdr.map(h=>r[h]||'').join(',')+'\n'});
 document.getElementById('data-output').value=csv;
+sendToSheets(hdr,results);
 showScreen('screen-results');
+}
+
+function sendToSheets(headers,rows){
+fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({headers:headers,rows:rows})})
+.then(()=>console.log('Sent to Google Sheets'))
+.catch(err=>console.error('Sheet error:',err));
 }
 
 function downloadCSV(){
